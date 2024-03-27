@@ -9,10 +9,29 @@ const Products = () => {
   const [data, setData] = useState([]);
   const [maximum, setMaximum] = useState(Number(80));
   const [isDivVisible, setIsDivVisible] = useState(false);
+  const [cartItems, setCartItems] = useState([]);
+
+  const updateCartItems = (item, qty) => {
+    const existingItem = cartItems.find((_item) => _item.id === item.id);
+
+    if (existingItem) {
+      // Tambahkan quantity
+      setCartItems(
+        cartItems.map((_item) =>
+          _item.id === item.id
+            ? { ..._item, quantity: _item.quantity + qty }
+            : _item
+        )
+      );
+    } else {
+      // Tambahkan item baru
+      setCartItems([...cartItems, { ...item, quantity: 1 }]);
+    }
+  };
 
   const navigate = useNavigate();
-
-
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  // api confirugation
   useEffect(() => {
     const fetchDataAsync = async () => {
       const data = await fetchData();
@@ -31,14 +50,13 @@ const Products = () => {
     }
   };
 
-
   //filter data product
   const filteredData = data.filter((item) => item.price <= maximum);
 
   return (
     <section className="bg-[#ffffec]">
       {/*  Navbar Product */}
-      <nav className="flex justify-around pt-6 mb-12 w-12/12  ">
+      <nav className="flex justify-around pt-6 mb-12 w-12/12   ">
         <div className=" w-6/12 justify-start">
           <button
             onClick={() => navigate("/")}
@@ -51,13 +69,74 @@ const Products = () => {
           <button onClick={handleButtonClick} className="px-3">
             <img src={Shopping} alt="" />
           </button>
+
+          {/* menu Cart */}
+
           <div className="w-[155px] h-10 bg-[#597E52] text-start  rounded-lg self-center flex justify-between auto ">
-            <span className="h-5 w-5 bg-white rounded mx-2 shadow m-auto ">
-
+            <span className="h-10 w-5 bg-white rounded mx-2 shadow m-auto text-center ">
+              <p className="text-center py-2 font-mono font-semibold">
+                {cartItems.reduce((total, item) => total + item.quantity, 0)}
+              </p>
             </span>
-            <span className="m-auto font-source text-white">
+            <button
+              onClick={() => setIsCartOpen(!isCartOpen)}
+              className="m-auto"
+            >
+              <span className="font-source text-white text-center font-bold pr-5">
+                Rp.{" "}
+                {cartItems
+                  .reduce(
+                    (total, item) => total + item.price * item.quantity,
+                    0
+                  )
+                  .toFixed(3)}
+              </span>
+            </button>
 
-            </span>
+            {/* menu dropdown */}
+
+            <div
+              className={`absolute top-12 right-0 w-[200px] bg-white z-10 rounded-lg shadow-lg ${
+                isCartOpen ? "block" : "hidden"
+              }`}
+            >
+              {cartItems.map((item, index) => (
+                <div key={item.id} className="p-4 border-b">
+                  <p>{item.name}</p>
+                  <p>Quantity: {item.quantity}</p>
+                  <p>
+                    Price: Rp.
+                    {(
+                      item.price * item.quantity +
+                      cartItems.reduce(
+                        (total, _item) => total + _item.price * _item.quantity,
+                        0
+                      ) -
+                      cartItems.reduce(
+                        (total, _item) =>
+                          total + _item.price * _item.quantity * _item.quantity,
+                        0
+                      ) /
+                        cartItems.reduce(
+                          (total, _item) => total + _item.quantity,
+                          0
+                        )
+                    ).toFixed(3)}
+                  </p>
+                </div>
+              ))}
+
+              {/* Tambahkan tombol checkout */}
+              <button
+                onClick={() => {
+                  // Implementasi untuk checkout
+                  console.log("Checkout: ", cartItems);
+                }}
+                className="w-full rounded-lg drop-shadow bg-[#597E52] p-3"
+              >
+                <p className="text-xl text-white font-source font-bold ">Checkout</p>
+              </button>
+            </div>
           </div>
         </div>
       </nav>
@@ -85,12 +164,13 @@ const Products = () => {
       </div>
 
       {/* Data Product */}
-      <div className="flex justify-center flex-wrap align-content-center  w-10/12 m-auto ">
+      <div className="flex justify-center flex-wrap align-content-center  w-10/12 m-auto  ">
         {filteredData.map((item, index) => (
           <div
             key={item.id}
-            className={`m-5 animate__animated ${index % 2 === 0 ? `animate__fadeInLeft` : `animate__fadeinRight`
-              }`}
+            className={`m-5 animate__animated ${
+              index % 2 === 0 ? `animate__fadeInLeft` : `animate__fadeinRight`
+            }`}
             style={{
               animationDelay: `${index * 0.1}s`,
             }}
@@ -113,7 +193,13 @@ const Products = () => {
                 <p className="font-source font-bold text-[#597E52] text-xl  pl-3 pb-3">
                   Rp{Number(item.price).toFixed(3)}.-
                 </p>
-                <button><img src={shoppingCart} alt="ShopingCart" className=" pl-20 pb-3" /></button>
+                <button onClick={() => updateCartItems(item, 1)}>
+                  <img
+                    src={shoppingCart}
+                    alt="ShopingCart"
+                    className=" pl-20 pb-3"
+                  />
+                </button>
               </div>
             </div>
           </div>
