@@ -60,9 +60,9 @@ const Products = () => {
         <div className=" w-6/12 justify-start">
           <button
             onClick={() => navigate("/")}
-            className="font-luckiest text-3xl text-[#597E52]"
+            className="font-luckiest text-3xl text-[#597E52] hover:text-[#4a963b]"
           >
-            Logo
+            CYkir SHOP
           </button>
         </div>
         <div className="flex justify-end w-6/1">
@@ -95,48 +95,44 @@ const Products = () => {
 
             {/* menu dropdown */}
 
-            <div
-              className={`absolute top-12 right-0 w-[200px] bg-white z-10 rounded-lg shadow-lg ${
-                isCartOpen ? "block" : "hidden"
-              }`}
-            >
-              {cartItems.map((item, index) => (
-                <div key={item.id} className="p-4 border-b">
-                  <p>{item.name}</p>
-                  <p>Quantity: {item.quantity}</p>
-                  <p>
-                    Price: Rp.
-                    {(
-                      item.price * item.quantity +
-                      cartItems.reduce(
-                        (total, _item) => total + _item.price * _item.quantity,
+            {isCartOpen && (
+              <div
+                className={`absolute top-12 right-0 w-[200px] bg-white z-10 rounded-lg shadow-lg ${
+                  isCartOpen ? "block" : "hidden"
+                }`}
+              >
+                {cartItems.map((item, index) => (
+                  <div key={item.id} className="p-4 border-b">
+                    <p>{item.name}</p>
+                    <p>Quantity: {item.quantity}</p>
+                    <p>Price: Rp. {(item.price * item.quantity).toFixed(3)}</p>
+                  </div>
+                ))}
+                <div className="p-4">
+                  <p className="font-source font-bold text-lg">
+                    Total: Rp.{" "}
+                    {cartItems
+                      .reduce(
+                        (total, item) => total + item.price * item.quantity,
                         0
-                      ) -
-                      cartItems.reduce(
-                        (total, _item) =>
-                          total + _item.price * _item.quantity * _item.quantity,
-                        0
-                      ) /
-                        cartItems.reduce(
-                          (total, _item) => total + _item.quantity,
-                          0
-                        )
-                    ).toFixed(3)}
+                      )
+                      .toFixed(3)}
+                    .-
                   </p>
                 </div>
-              ))}
-
-              {/* Tambahkan tombol checkout */}
-              <button
-                onClick={() => {
-                  // Implementasi untuk checkout
-                  console.log("Checkout: ", cartItems);
-                }}
-                className="w-full rounded-lg drop-shadow bg-[#597E52] p-3"
-              >
-                <p className="text-xl text-white font-source font-bold ">Checkout</p>
-              </button>
-            </div>
+                <button
+                  className="w-full rounded-lg drop-shadow bg-[#597E52] p-3"
+                  onClick={() => {
+                    // Implementasi untuk checkout
+                    console.log("Checkout: ", cartItems);
+                  }}
+                >
+                  <button className="text-xl text-white font-source font-bold ">
+                    Checkout
+                  </button>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </nav>
